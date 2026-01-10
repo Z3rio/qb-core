@@ -334,3 +334,29 @@ local function ExploitBan(playerId, origin)
 end
 
 exports('ExploitBan', ExploitBan)
+
+-- Exports for the player functions/object
+local playerFunctions = {
+    AddPlayerMoney = "AddMoney",
+    RemovePlayerMoney = "RemoveMoney"
+}
+
+for exportName, functionName in pairs(playerFunctions) do
+    exports(exportName, function(identifier, ...)
+        if not type(identifier) == "string" then
+            warn("Identifier has to be a string")
+            return false
+        end
+
+        local plr = QBCore.Functions.GetPlayerByCitizenId(identifier)
+
+        if plr then
+            if not type(plr.Functions[functionName]) == "function" then
+                warn("Something went wrong, could not find/execute the player function")
+                return false
+            end
+
+            return plr.Functions[functionName](...)
+        end
+    end)
+end
